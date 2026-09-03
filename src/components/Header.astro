@@ -13,11 +13,17 @@ const BASE = import.meta.env.BASE_URL;
 			<HeaderLink href={`${BASE}about/`}>소개</HeaderLink>
 		</div>
 		<div class="external-links">
+			<a href={`${BASE}admin/?new=1`} id="write-btn" hidden>✏️ 새 글</a>
 			<a href="https://minsuk-ji.github.io/" target="_blank">포트폴리오 ↗</a>
 			<a href="https://github.com/Minsuk-ji" target="_blank">GitHub ↗</a>
 		</div>
 	</nav>
 </header>
+<script>
+	if (localStorage.getItem('mn_admin_token')) {
+		document.getElementById('write-btn')?.removeAttribute('hidden');
+	}
+</script>
 <style>
 	header {
 		border-bottom: 1px solid var(--line);

@@ -463,29 +463,37 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 				deleteBtn.style.display = '';
 			}
 
+			let knownPosts: { name: string; path: string }[] = [];
+
+			async function openPost(path: string) {
+				setStatus('불러오는 중...');
+				try {
+					const data = await loadPost(path);
+					fillForm(path, data);
+					for (const a of postList.querySelectorAll('a')) {
+						a.classList.toggle('active', a.dataset.path === path);
+					}
+					setStatus('');
+				} catch (err: any) {
+					setStatus(err.message, true);
+				}
+			}
+
 			async function refreshList(selectPath?: string) {
 				postList.innerHTML = '<li>불러오는 중...</li>';
 				try {
-					const posts = await listPosts();
+					knownPosts = await listPosts();
 					postList.innerHTML = '';
-					for (const post of posts) {
+					for (const post of knownPosts) {
 						const li = document.createElement('li');
 						const a = document.createElement('a');
 						a.href = '#';
+						a.dataset.path = post.path;
 						a.textContent = post.name.replace(/\.mdx?$/, '');
 						if (post.path === selectPath) a.classList.add('active');
-						a.addEventListener('click', async (e) => {
+						a.addEventListener('click', (e) => {
 							e.preventDefault();
-							setStatus('불러오는 중...');
-							try {
-								const data = await loadPost(post.path);
-								fillForm(post.path, data);
-								for (const other of postList.querySelectorAll('a')) other.classList.remove('active');
-								a.classList.add('active');
-								setStatus('');
-							} catch (err: any) {
-								setStatus(err.message, true);
-							}
+							openPost(post.path);
 						});
 						li.appendChild(a);
 						postList.appendChild(li);
@@ -588,6 +596,20 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 				editor.style.display = 'block';
 				clearForm(true);
 				await refreshList();
+
+				// 글 페이지의 "✏️ 이 글 수정" 버튼(?edit=slug)이나 헤더의
+				// "✏️ 새 글" 버튼(?new=1)으로 들어온 경우, 클릭 없이 바로 해당
+				// 상태로 진입한다.
+				const params = new URLSearchParams(location.search);
+				const editSlug = params.get('edit');
+				if (editSlug && knownPosts.length > 0) {
+					const match = knownPosts.find((p) => p.name.replace(/\.mdx?$/, '') === editSlug);
+					if (match) await openPost(match.path);
+					else setStatus(`"${editSlug}" 글을 찾을 수 없습니다.`, true);
+				} else if (params.has('new')) {
+					fTitle.focus();
+				}
+				history.replaceState(null, '', location.pathname);
 			}
 
 			if (getToken()) {
