@@ -18,70 +18,46 @@ const categoryLabel = CATEGORIES.find((c) => c.id === category)?.label ?? catego
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
 			.hero-image img {
 				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
+				margin: 0 0 2em 0;
+				border-radius: 6px;
 			}
 			.meta {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				margin: 0 0 0.6em 0;
+				color: rgb(var(--muted));
+				font-size: 0.82em;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
 			}
-			.category-badge {
-				display: inline-block;
-				padding: 0.2em 0.7em;
-				margin-bottom: 0.5em;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-				font-size: 0.8em;
+			.meta .category {
+				color: var(--accent-ink);
+			}
+			h1 {
+				margin-bottom: 0.6em;
+			}
+			.article-head {
+				margin-bottom: 2.5em;
+				padding-bottom: 2em;
+				border-bottom: 1px solid var(--line);
 			}
 			.last-updated-on {
 				font-style: italic;
 			}
 			.tags {
-				margin-top: 2em;
-				padding-top: 1em;
-				border-top: 1px solid rgb(var(--gray-light));
+				margin-top: 3em;
+				padding-top: 1.2em;
+				border-top: 1px solid var(--line);
+				display: flex;
+				gap: 1em;
+				font-size: 0.85em;
 			}
 			.tags a {
-				display: inline-block;
-				margin: 0 0.5em 0.5em 0;
-				padding: 0.2em 0.7em;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-				font-size: 0.85em;
+				color: rgb(var(--muted));
 				text-decoration: none;
 			}
 			.tags a:hover {
-				background: var(--accent);
-				color: white;
+				color: var(--accent);
 			}
 		</style>
 	</head>
@@ -90,36 +66,38 @@ const categoryLabel = CATEGORIES.find((c) => c.id === category)?.label ?? catego
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				{
+					heroImage && (
+						<div class="hero-image">
+							<Image width={1020} height={510} src={heroImage} alt="" />
+						</div>
+					)
+				}
+				<div class="article-head">
+					<p class="meta">
+						<span class="category">{categoryLabel}</span>
+						{' · '}
+						<FormattedDate date={date} />
+						{
+							updatedDate && (
+								<span class="last-updated-on"> (수정: <FormattedDate date={updatedDate} />)</span>
+							)
+						}
+					</p>
+					<h1>{title}</h1>
 				</div>
 				<div class="prose">
-					<div class="title">
-						<span class="category-badge">{categoryLabel}</span>
-						<h1>{title}</h1>
-						<div class="meta">
-							<FormattedDate date={date} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										마지막 수정: <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<hr />
-					</div>
 					<slot />
-					{
-						tags && tags.length > 0 && (
-							<div class="tags">
-								{tags.map((tag) => (
-									<a href={`${BASE}tags/${tag}/`}>#{tag}</a>
-								))}
-							</div>
-						)
-					}
 				</div>
+				{
+					tags && tags.length > 0 && (
+						<div class="tags">
+							{tags.map((tag) => (
+								<a href={`${BASE}tags/${tag}/`}>#{tag}</a>
+							))}
+						</div>
+					)
+				}
 			</article>
 		</main>
 		<Footer />

@@ -25,6 +25,32 @@ const BASE = import.meta.env.BASE_URL;
 <html lang="ko">
 	<head>
 		<BaseHead title={`#${tag} · ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			h1 {
+				margin-bottom: 1em;
+				padding-bottom: 1em;
+				border-bottom: 1px solid var(--line);
+			}
+			ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			li {
+				margin-bottom: 1em;
+			}
+			li a {
+				color: rgb(var(--ink));
+				text-decoration: none;
+			}
+			li a:hover {
+				color: var(--accent);
+			}
+			time {
+				color: rgb(var(--muted));
+				font-size: 0.85em;
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
@@ -34,8 +60,7 @@ const BASE = import.meta.env.BASE_URL;
 				{
 					posts.map((post) => (
 						<li>
-							<a href={`${BASE}posts/${post.id}/`}>{post.data.title}</a>
-							{' — '}
+							<a href={`${BASE}posts/${post.id}/`}>{post.data.title}</a> —{' '}
 							<FormattedDate date={post.data.date} />
 						</li>
 					))

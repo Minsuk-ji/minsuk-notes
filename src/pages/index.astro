@@ -19,23 +19,26 @@ const BASE = import.meta.env.BASE_URL;
 		<style>
 			.filters {
 				display: flex;
-				gap: 0.5em;
-				margin-bottom: 2em;
-				flex-wrap: wrap;
+				gap: 1.4em;
+				margin-bottom: 2.8em;
+				border-bottom: 1px solid var(--line);
+				padding-bottom: 0.9em;
 			}
 			.filters button {
-				padding: 0.4em 1em;
-				border-radius: 999px;
-				border: 1px solid rgb(var(--gray-light));
-				background: white;
-				color: rgb(var(--gray-dark));
+				padding: 0;
+				border: none;
+				background: none;
+				color: rgb(var(--muted));
 				font-size: 0.9em;
+				letter-spacing: 0.02em;
 				cursor: pointer;
 			}
 			.filters button.active {
-				background: var(--accent);
-				border-color: var(--accent);
-				color: white;
+				color: rgb(var(--ink));
+				font-weight: 600;
+			}
+			.filters button:hover {
+				color: var(--accent);
 			}
 			ul {
 				list-style-type: none;
@@ -43,39 +46,39 @@ const BASE = import.meta.env.BASE_URL;
 				padding: 0;
 			}
 			li {
-				margin-bottom: 1.5em;
-				padding-bottom: 1.5em;
-				border-bottom: 1px solid rgb(var(--gray-light));
+				margin-bottom: 2em;
+				padding-bottom: 2em;
+				border-bottom: 1px solid var(--line);
+			}
+			li:last-child {
+				border-bottom: none;
 			}
 			li.hidden {
 				display: none;
 			}
 			.title {
-				margin: 0 0 0.2em 0;
+				margin: 0.3em 0 0.3em 0;
 			}
 			.title a {
-				color: rgb(var(--black));
+				color: rgb(var(--ink));
 				text-decoration: none;
 			}
 			.title a:hover {
 				color: var(--accent);
 			}
 			.meta {
-				margin: 0 0 0.4em 0;
-				color: rgb(var(--gray));
-				font-size: 0.9em;
+				margin: 0;
+				color: rgb(var(--muted));
+				font-size: 0.82em;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
 			}
-			.category-badge {
-				display: inline-block;
-				padding: 0.1em 0.6em;
-				margin-right: 0.5em;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				font-size: 0.85em;
+			.meta .category {
+				color: var(--accent-ink);
 			}
 			.description {
 				margin: 0;
-				color: rgb(var(--gray-dark));
+				color: rgb(var(--muted));
 			}
 		</style>
 	</head>
@@ -97,9 +100,10 @@ const BASE = import.meta.env.BASE_URL;
 					posts.map((post) => (
 						<li data-category={post.data.category}>
 							<p class="meta">
-								<span class="category-badge">
+								<span class="category">
 									{CATEGORIES.find((c) => c.id === post.data.category)?.label}
 								</span>
+								{' · '}
 								<FormattedDate date={post.data.date} />
 							</p>
 							<h2 class="title">

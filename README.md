@@ -20,6 +20,14 @@ draft: false # true면 어떤 페이지에도 노출되지 않음(비공개 초�
 ---
 ```
 
+## 사이트에서 바로 글 쓰기/수정하기
+
+https://minsuk-ji.github.io/minsuk-notes/admin/ 에서 로컬에서 git을 안 쓰고도 글을 목록/작성/수정/삭제할 수 있습니다.
+
+- 최초 1회, [fine-grained PAT](https://github.com/settings/personal-access-tokens/new)를 이 레포(`minsuk-notes`)에만, `Contents: Read and write` 권한으로 만들어 붙여넣으면 됩니다.
+- 토큰은 그 브라우저의 localStorage에만 저장되고, GitHub API로 직접 요청하는 데만 쓰입니다 — 다른 곳으로 전송되지 않습니다. 비밀번호처럼 취급하고, 공유 기기에서는 로그아웃하세요. 토큰을 잃어버렸거나 노출됐다면 GitHub 설정에서 바로 폐기(revoke)할 수 있습니다.
+- 저장하면 `main`에 바로 커밋되고, GitHub Actions가 자동으로 다시 빌드/배포합니다(수십 초 소요).
+
 ## 프로젝트 구조
 
 ```text
