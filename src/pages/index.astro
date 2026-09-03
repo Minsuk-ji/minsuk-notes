@@ -1,14 +1,17 @@
 ---
+import CategoryTree from '../components/CategoryTree.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { CATEGORIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { buildCategoryTree, categoryLabelPath } from '../lib/categories';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
+const categoryTree = buildCategoryTree(posts.map((p) => p.data.category));
 const BASE = import.meta.env.BASE_URL;
 ---
 
@@ -17,43 +20,52 @@ const BASE = import.meta.env.BASE_URL;
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			.filters {
-				display: flex;
-				gap: 1.4em;
-				margin-bottom: 2.8em;
-				border-bottom: 1px solid var(--line);
-				padding-bottom: 0.9em;
+			.home-main {
+				width: 900px;
 			}
-			.filters button {
-				padding: 0;
+			.layout {
+				display: grid;
+				grid-template-columns: 180px 1fr;
+				gap: 3em;
+			}
+			.sidebar {
+				position: sticky;
+				top: 2em;
+				align-self: start;
+			}
+			.sidebar .all-btn {
+				display: block;
+				width: 100%;
+				text-align: left;
+				padding: 0.25em 0;
+				margin-bottom: 0.3em;
 				border: none;
 				background: none;
 				color: rgb(var(--muted));
 				font-size: 0.9em;
-				letter-spacing: 0.02em;
+				font-weight: 600;
 				cursor: pointer;
 			}
-			.filters button.active {
+			.sidebar .all-btn.active {
 				color: rgb(var(--ink));
-				font-weight: 600;
 			}
-			.filters button:hover {
+			.sidebar .all-btn:hover {
 				color: var(--accent);
 			}
-			ul {
+			ul.post-list {
 				list-style-type: none;
 				margin: 0;
 				padding: 0;
 			}
-			li {
+			ul.post-list li {
 				margin-bottom: 2em;
 				padding-bottom: 2em;
 				border-bottom: 1px solid var(--line);
 			}
-			li:last-child {
+			ul.post-list li:last-child {
 				border-bottom: none;
 			}
-			li.hidden {
+			ul.post-list li.hidden {
 				display: none;
 			}
 			.title {
@@ -80,52 +92,67 @@ const BASE = import.meta.env.BASE_URL;
 				margin: 0;
 				color: rgb(var(--muted));
 			}
+			.empty {
+				color: rgb(var(--muted));
+			}
+			@media (max-width: 640px) {
+				.layout {
+					grid-template-columns: 1fr;
+				}
+				.sidebar {
+					position: static;
+					display: flex;
+					flex-wrap: wrap;
+					gap: 0 1.2em;
+					border-bottom: 1px solid var(--line);
+					padding-bottom: 1em;
+					margin-bottom: 1.5em;
+				}
+			}
 		</style>
 	</head>
 	<body>
 		<Header />
-		<main>
-			<div class="filters" id="filters">
-				<button type="button" data-filter="all" class="active">전체</button>
-				{
-					CATEGORIES.map((c) => (
-						<button type="button" data-filter={c.id}>
-							{c.label}
-						</button>
-					))
-				}
+		<main class="home-main">
+			<div class="layout">
+				<aside class="sidebar" id="filters">
+					<button type="button" class="all-btn active" data-filter="all">전체</button>
+					<CategoryTree nodes={categoryTree} />
+				</aside>
+				<div>
+					<ul class="post-list" id="post-list">
+						{
+							posts.map((post) => (
+								<li data-category={post.data.category}>
+									<p class="meta">
+										<span class="category">{categoryLabelPath(post.data.category)}</span>
+										{' · '}
+										<FormattedDate date={post.data.date} />
+									</p>
+									<h2 class="title">
+										<a href={`${BASE}posts/${post.id}/`}>{post.data.title}</a>
+									</h2>
+									{post.data.description && <p class="description">{post.data.description}</p>}
+								</li>
+							))
+						}
+					</ul>
+					{posts.length === 0 && <p class="empty">아직 글이 없습니다.</p>}
+				</div>
 			</div>
-			<ul id="post-list">
-				{
-					posts.map((post) => (
-						<li data-category={post.data.category}>
-							<p class="meta">
-								<span class="category">
-									{CATEGORIES.find((c) => c.id === post.data.category)?.label}
-								</span>
-								{' · '}
-								<FormattedDate date={post.data.date} />
-							</p>
-							<h2 class="title">
-								<a href={`${BASE}posts/${post.id}/`}>{post.data.title}</a>
-							</h2>
-							{post.data.description && <p class="description">{post.data.description}</p>}
-						</li>
-					))
-				}
-			</ul>
 		</main>
 		<Footer />
 		<script>
-			const buttons = document.querySelectorAll<HTMLButtonElement>('#filters button');
+			const buttons = document.querySelectorAll<HTMLButtonElement>('#filters [data-filter]');
 			const items = document.querySelectorAll<HTMLLIElement>('#post-list li');
 
 			for (const button of buttons) {
 				button.addEventListener('click', () => {
-					const filter = button.dataset.filter;
+					const filter = button.dataset.filter!;
 					for (const b of buttons) b.classList.toggle('active', b === button);
 					for (const item of items) {
-						const show = filter === 'all' || item.dataset.category === filter;
+						const cat = item.dataset.category ?? '';
+						const show = filter === 'all' || cat === filter || cat.startsWith(`${filter}/`);
 						item.classList.toggle('hidden', !show);
 					}
 				});

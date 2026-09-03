@@ -13,7 +13,8 @@ const posts = defineCollection({
 			// Transform string to Date object
 			date: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
-			category: z.enum(['study', 'project', 'daily']),
+			// 자유 입력. '/'로 구분해 하위 카테고리를 만들 수 있다 (예: '프로젝트/SO101').
+			category: z.string().trim().min(1, '카테고리를 입력하세요'),
 			tags: z.array(z.string()).optional().default([]),
 			// draft 글은 어떤 페이지/RSS/사이트맵에도 노출되지 않는다 (비공개로 남기고 싶은 글용).
 			draft: z.boolean().optional().default(false),

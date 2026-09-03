@@ -5,13 +5,13 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { CATEGORIES } from '../consts';
+import { categoryLabelPath } from '../lib/categories';
 
 type Props = CollectionEntry<'posts'>['data'] & { id: string };
 
 const { id, title, description, date, updatedDate, heroImage, category, tags } = Astro.props;
 const BASE = import.meta.env.BASE_URL;
-const categoryLabel = CATEGORIES.find((c) => c.id === category)?.label ?? category;
+const categoryLabel = categoryLabelPath(category);
 ---
 
 <html lang="ko">

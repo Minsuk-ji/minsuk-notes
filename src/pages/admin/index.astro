@@ -1,7 +1,7 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
-import { CATEGORIES, SITE_TITLE } from '../../consts';
+import { SITE_TITLE } from '../../consts';
 ---
 
 <!doctype html>
@@ -209,10 +209,13 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 								<input type="date" id="f-date" />
 							</div>
 							<div class="field">
-								<label for="f-category">카테고리</label>
-								<select id="f-category">
-									{CATEGORIES.map((c) => <option value={c.id}>{c.label}</option>)}
-								</select>
+								<label for="f-category">카테고리 (예: 프로젝트, 프로젝트/SO101)</label>
+								<input type="text" id="f-category" list="category-hints" placeholder="study" />
+								<datalist id="category-hints">
+									<option value="study" />
+									<option value="project" />
+									<option value="daily" />
+								</datalist>
 							</div>
 						</div>
 						<div class="field">
@@ -426,7 +429,15 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 			const fTitle = $<HTMLInputElement>('f-title');
 			const fDescription = $<HTMLInputElement>('f-description');
 			const fDate = $<HTMLInputElement>('f-date');
-			const fCategory = $<HTMLSelectElement>('f-category');
+			const fCategory = $<HTMLInputElement>('f-category');
+			const categoryHints = $<HTMLDataListElement>('category-hints');
+
+			function rememberCategory(category: string) {
+				if (!category || categoryHints.querySelector(`option[value="${CSS.escape(category)}"]`)) return;
+				const option = document.createElement('option');
+				option.value = category;
+				categoryHints.appendChild(option);
+			}
 			const fTags = $<HTMLInputElement>('f-tags');
 			const fDraft = $<HTMLInputElement>('f-draft');
 			const fBody = $<HTMLTextAreaElement>('f-body');
@@ -461,6 +472,7 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 				fDraft.checked = data.draft;
 				fBody.value = data.body;
 				deleteBtn.style.display = '';
+				rememberCategory(data.category);
 			}
 
 			let knownPosts: { name: string; path: string }[] = [];
@@ -525,11 +537,15 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 					setStatus('제목을 입력하세요.', true);
 					return;
 				}
+				if (!fCategory.value.trim()) {
+					setStatus('카테고리를 입력하세요.', true);
+					return;
+				}
 				const data: PostData = {
 					title: fTitle.value.trim(),
 					description: fDescription.value.trim(),
 					date: fDate.value,
-					category: fCategory.value,
+					category: fCategory.value.trim(),
 					tags: fTags.value
 						.split(',')
 						.map((t) => t.trim())
@@ -549,6 +565,7 @@ import { CATEGORIES, SITE_TITLE } from '../../consts';
 					fSha.value = res.content.sha;
 					fSlugField.style.display = 'none';
 					deleteBtn.style.display = '';
+					rememberCategory(data.category);
 					setStatus('저장됨 — 잠시 후 사이트에 자동 반영됩니다 (Actions 빌드 중).');
 					await refreshList(path);
 				} catch (err: any) {
