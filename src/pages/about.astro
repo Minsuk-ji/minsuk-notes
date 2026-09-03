@@ -1,0 +1,33 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={`소개 · ${SITE_TITLE}`} description="이 사이트와 운영 방식 소개" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>소개</h1>
+			<p>
+				공부한 내용, 진행한 프로젝트, 짧은 데일리 기록을 정리하는 개인 노트 사이트입니다. 글은 카테고리(스터디
+				/ 프로젝트 / 데일리)와 태그로 분류됩니다.
+			</p>
+			<p>
+				더 자세한 이력/발표/연구 소개는 <a href="https://minsuk-ji.github.io/" target="_blank"
+					>포트폴리오 사이트</a
+				>에서 볼 수 있습니다.
+			</p>
+			<p>
+				이 사이트는 <a href="https://astro.build/" target="_blank">Astro</a>로 만들어졌고, 소스는
+				<a href="https://github.com/Minsuk-ji/minsuk-notes" target="_blank">GitHub</a>에 공개되어 있습니다.
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>

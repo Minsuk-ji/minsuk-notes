@@ -1,0 +1,127 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { CATEGORIES } from '../consts';
+
+type Props = CollectionEntry<'posts'>['data'];
+
+const { title, description, date, updatedDate, heroImage, category, tags } = Astro.props;
+const BASE = import.meta.env.BASE_URL;
+const categoryLabel = CATEGORIES.find((c) => c.id === category)?.label ?? category;
+---
+
+<html lang="ko">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+			}
+			.hero-image {
+				width: 100%;
+			}
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1;
+			}
+			.title h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.meta {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+			.category-badge {
+				display: inline-block;
+				padding: 0.2em 0.7em;
+				margin-bottom: 0.5em;
+				border-radius: 999px;
+				background: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				font-size: 0.8em;
+			}
+			.last-updated-on {
+				font-style: italic;
+			}
+			.tags {
+				margin-top: 2em;
+				padding-top: 1em;
+				border-top: 1px solid rgb(var(--gray-light));
+			}
+			.tags a {
+				display: inline-block;
+				margin: 0 0.5em 0.5em 0;
+				padding: 0.2em 0.7em;
+				border-radius: 999px;
+				background: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				font-size: 0.85em;
+				text-decoration: none;
+			}
+			.tags a:hover {
+				background: var(--accent);
+				color: white;
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				</div>
+				<div class="prose">
+					<div class="title">
+						<span class="category-badge">{categoryLabel}</span>
+						<h1>{title}</h1>
+						<div class="meta">
+							<FormattedDate date={date} />
+							{
+								updatedDate && (
+									<div class="last-updated-on">
+										마지막 수정: <FormattedDate date={updatedDate} />
+									</div>
+								)
+							}
+						</div>
+						<hr />
+					</div>
+					<slot />
+					{
+						tags && tags.length > 0 && (
+							<div class="tags">
+								{tags.map((tag) => (
+									<a href={`${BASE}tags/${tag}/`}>#{tag}</a>
+								))}
+							</div>
+						)
+					}
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
